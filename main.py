@@ -7,8 +7,8 @@ APPS_TO_TRACK = [VS_CODE_APP]
 
 def appMonitor(c, apps, interval=1):
     # Initialise counts
-    counts = {} # TODO: There should only be a single count for both IDEs. \
-                #       Count is currently separated per app. 
+    counts = {}
+
     for app in apps:
         procs = c.Win32_Process(Name=app)
         counts[app] = len(procs)
@@ -22,20 +22,28 @@ def appMonitor(c, apps, interval=1):
                 current_procs = c.Win32_Process(Name=app)
                 current_count = len(current_procs)
                 old_count = counts[app]
+                total_count = sum(counts.values())
 
                 if current_count != old_count:
-                    if old_count == 0 and current_count > 0:
-                        # First instance opened
-                        pid = current_procs[0].ProcessId  # get one PID
-                        print(f"{app} opened (first instance). PID: {pid}")
-                    elif old_count > 0 and current_count == 0:
-                        # Last instance closed
-                        # We don't have the PID of the closed one, but we can track if needed
-                        print(f"{app} closed (last instance).")
-                    # (Optionally handle multiple instances opening/closing at once,
-                    # but we only care about transitions to/from zero.)
+                  if current_count > 0 and total_count == 0:
+                    print(f"First IDE opened. ({"VS Code" if app == "Code.exe" else app})")
+                  elif current_count == 0 and total_count > 0:
+                    print(f"Last IDE closed. ({"VS Code" if app == "Code.exe" else app})")
 
-                    counts[app] = current_count
+                # if current_count != old_count:
+                #     if old_count == 0 and current_count > 0:
+                #         # First instance opened
+                #         pid = current_procs[0].ProcessId  # get one PID
+                #         print(f"{app} opened (first instance). PID: {pid}")
+                #     elif old_count > 0 and current_count == 0:
+                #         # Last instance closed
+                #         # We don't have the PID of the closed one, but we can track if needed
+                #         print(f"{app} closed (last instance).")
+                #     # (Optionally handle multiple instances opening/closing at once,
+                #     # but we only care about transitions to/from zero.)
+
+                  counts[app] = current_count
+                  total_count = sum(counts.values())
 
     except KeyboardInterrupt:
         print("\nExiting...")
