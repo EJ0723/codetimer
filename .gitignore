@@ -1,3 +1,6 @@
-#ignore environment files
+# ignore environment files
 .env
 venv
+
+# ignore diff files
+*.diff
