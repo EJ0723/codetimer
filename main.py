@@ -64,6 +64,8 @@ def appMonitor(c, apps, interval=1):
     start = None
     end = None
 
+    start_switch = 0
+
     for app in apps:
       procs = c.Win32_Process(Name=app)
       counts[app] = len(procs)
@@ -81,18 +83,19 @@ def appMonitor(c, apps, interval=1):
           old_total_count = sum(counts.values())
 
           # detect a change in process count for specific app
-          if current_count != old_count:
+          if start_switch == 0 or current_count != old_count:
             # print(f"current_count ({app}): {current_count}\n old_count ({app}): {old_count}\n total_count: {total_count}\n old_total_count: {old_total_count}\n")
             # detect first instance opened among both IDEs
-            if current_count > 0 and old_total_count == 0:
+            if start_switch == 0 or (current_count > 0 and old_total_count == 0):
+              start_switch = 1
               print(f"First IDE opened. ({"VS Code" if app == "Code.exe" else app})")
               start = datetime.now(ZoneInfo("Asia/Manila"))
-              print(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
+              print(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}\n")
             # detect last instance closed among both IDEs
             elif current_count == 0 and total_count == 0:
               print(f"Last IDE closed. ({"VS Code" if app == "Code.exe" else app})")
               end = datetime.now(ZoneInfo("Asia/Manila"))
-              print(f"End time: {end.strftime('%Y-%m-%d %H:%M:%S')}")
+              print(f"End time: {end.strftime('%Y-%m-%d %H:%M:%S')}\n")
 
               # Get duration in minutes and seconds
               duration = (end - start) if (start and end) else None
