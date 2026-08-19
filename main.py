@@ -60,7 +60,8 @@ def appMonitor(c, apps, interval=1):
     service = build("calendar", "v3", credentials=creds)
 
     # Initialize counts
-    counts = {}
+    # counts = {}
+    # Initialize start and end times
     start = None
     end = None
 
@@ -68,31 +69,32 @@ def appMonitor(c, apps, interval=1):
 
     for app in apps:
       procs = c.Win32_Process(Name=app)
-      counts[app] = len(procs)
-      if counts[app] > 0:
-        print(f"{app} is already running ({counts[app]} instances).")
+      count = len(procs)
+      if count > 0:
+        print(f"{app} is already running ({count} instances).")
 
     try:
       while True:
         time.sleep(interval)
         for app in apps:
-          current_procs = c.Win32_Process(Name=app)
-          current_count = len(current_procs)
-          old_count = counts[app]
+          # current_procs = c.Win32_Process(Name=app)
+          # current_count = len(current_procs)
+          # old_count = counts[app]
           total_count = sum([len(c.Win32_Process(Name=app)) for app in apps])
-          old_total_count = sum(counts.values())
+          # old_total_count = sum(counts.values())
 
           # detect a change in process count for specific app
-          if start_switch == 0 or current_count != old_count:
+          if start_switch == 0 or total_count == 0:
             # print(f"current_count ({app}): {current_count}\n old_count ({app}): {old_count}\n total_count: {total_count}\n old_total_count: {old_total_count}\n")
             # detect first instance opened among both IDEs
-            if start_switch == 0 or (current_count > 0 and old_total_count == 0):
+            if start_switch == 0 and total_count > 0:
               start_switch = 1
               print(f"First IDE opened. ({"VS Code" if app == "Code.exe" else app})")
               start = datetime.now(ZoneInfo("Asia/Manila"))
               print(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}\n")
             # detect last instance closed among both IDEs
-            elif current_count == 0 and total_count == 0:
+            elif start_switch == 1 and total_count == 0:
+              start_switch = 0
               print(f"Last IDE closed. ({"VS Code" if app == "Code.exe" else app})")
               end = datetime.now(ZoneInfo("Asia/Manila"))
               print(f"End time: {end.strftime('%Y-%m-%d %H:%M:%S')}\n")
@@ -132,7 +134,7 @@ def appMonitor(c, apps, interval=1):
                 print(f"Event created: {event_result.get('htmlLink')}")
 
             # Update counts for next iteration
-            counts[app] = current_count
+            # counts[app] = current_count
             # total_count = sum(counts.values())
 
     except KeyboardInterrupt:
