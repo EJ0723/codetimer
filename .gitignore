@@ -1,0 +1,12 @@
+# ignore environment files
+.env
+venv
+
+# ignore diff files
+*.diff
+
+# ignore pycache files
+__pycache__
+
+# ignore log files
+*.log
