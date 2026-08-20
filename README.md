@@ -23,6 +23,9 @@ A simple utility to monitor when specific applications (e.g., VS Code, Zed) are 
    pip install -r requirements.txt
    ```
 
+4. **Setup GoogleAuth**
+   Place Google OAuth credentials at `.env/credentials.json` and your email at `.env/email.txt`
+
 4. **Run the script**
    ```powershell
    py .\src\main.py
