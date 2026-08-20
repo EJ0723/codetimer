@@ -25,7 +25,7 @@ A simple utility to monitor when specific applications (e.g., VS Code, Zed) are 
 
 4. **Run the script**
    ```powershell
-   python .\main.py
+   py .\src\main.py
    ```
 
 5. **Update dependencies**
